@@ -1,6 +1,6 @@
 package logica;
 
-import dominio.MenuAdmin;
+import dominio.*;
 
 public class Main {
 
