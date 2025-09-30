@@ -11,8 +11,8 @@ import dominio.*;
 public class Main {
 	
 	
-	static ArrayList<Computador> PCs = new ArrayList<>();
-	static ArrayList<Puerto> Puertos = new ArrayList<>();
+	public static ArrayList<Computador> PCs = new ArrayList<>();
+	public static ArrayList<Puerto> Puertos = new ArrayList<>();
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		
@@ -64,6 +64,7 @@ public class Main {
 			String hashedpword = p[1];
 			String role = p[2];
 			
+			
 			User u = new User(user, hashedpword, role);
 			listaUsuarios.add(u);
 			
@@ -105,8 +106,6 @@ public class Main {
 		
 	}
 	
-		
-		
 	
 	
 	public static void cargarDatos() throws FileNotFoundException
@@ -125,39 +124,82 @@ public class Main {
 			String IDadd = pcParts[0];
 			String IPadd = pcParts[1];
 			String OSadd = pcParts[2];
-			PCs.add(new Computador(IDadd, IPadd, OSadd));
+			
+			// EXTRA: PONER GRUPO DE IP :33333333 ()
+						
+			PCs.add(new Computador(IDadd, IPadd, OSadd, Computador.getGroupIP(IPadd)));
 		}
 		
-		for (Computador pc : PCs)
+		//Cargar puertos con info
+		
+		File vulne = new File("vulnerabilidades.txt");
+		Scanner scVulne = new Scanner(vulne);
+		
+		while (scVulne.hasNextLine())
 		{
-			System.out.println(pc);
+			String[] vulneParts = scVulne.nextLine().split("\\|");
+			int IDport = Integer.parseInt(vulneParts[0]);
+			String vuln = vulneParts[1];
+			String desc = vulneParts[2];
+			Puertos.add(new Puerto(IDport,vuln,desc));
 		}
 		
-		
-		/*
+		//ASOCIAR PUERTOS A PC ojala no falle  O.o
+			
 		File ports = new File("puertos.txt");
 		Scanner scanports = new Scanner(ports);
+		
 		
 		while (scanports.hasNextLine())
 		{
 			String[] portParts = scanports.nextLine().split("\\|");
-			String PCid = portParts[0];
-			int IDport = Integer.parseInt(portParts[1]);
-			boolean IDstate;
-			if (portParts[2].equals("Abierto")) {
-				IDstate = true;
-			} else if (portParts[2].equals("Cerrado")) {
-				IDstate = false;
+			String currentPC = portParts[0];
+			int portID = Integer.parseInt(portParts[1]);
+			boolean IDstate = portParts[2].equals("Abierto");
+			
+			for (Computador pc : PCs)
+			{
+				if (pc.getId().equals(currentPC))
+				{
+					boolean foundPort = false;
+					for (Puerto pr : Puertos)
+					{
+						if (pr.getNumero() == portID)
+						{
+					        Puerto newPort = new Puerto(pr.getNumero(), pr.getVulnerabilidad(), pr.getDescripcionVul());
+					        newPort.setState(IDstate);
+					        pc.getPuertos().add(newPort);
+					        foundPort = true;
+							
+							if (IDstate)
+							{
+								pc.riskUpgrade();
+							}
+							break;
+						}
+					}
+					
+					if (!foundPort)
+					{
+						Puerto portInfoless = new Puerto(portID, IDstate);
+						pc.getPuertos().add(portInfoless);
+						
+						if (IDstate)
+						{
+							pc.riskUpgrade();
+						}
+					}
+					break;
+				}
 			}
-			
-			
-			
 		}
 		
-		*/
 		
+		//estoy goated viejo
 		
-		pcscan.close();		
+		pcscan.close();	
+		scVulne.close();
+		scanports.close();
 	}
 	
 
