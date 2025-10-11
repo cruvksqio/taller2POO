@@ -3,6 +3,7 @@ package logica;
 Constantino Bekios 21761616-6
 Luis Molina 21564225-9
 */
+
 import java.io.*;
 import java.security.MessageDigest;
 import java.util.*;
@@ -13,9 +14,11 @@ public class Main {
 	
 	public static ArrayList<Computador> PCs = new ArrayList<>();
 	public static ArrayList<Puerto> Puertos = new ArrayList<>();
+	public static User UsuarioLogged;
+	public static String username;
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		
+	
 		cargarDatos();
 		
 		Scanner loginscan = new Scanner(System.in);
@@ -43,6 +46,7 @@ public class Main {
 		}
 		if (role.equals("USER")) {
 				System.out.println("Login exitoso. Rol: " + role);
+				MenuUser.abrirMenuUser();
 		}
 		
 		if (role.equals(null)) {
@@ -84,12 +88,13 @@ public class Main {
 			if (u.getUsername().equals(username)) {
 				String hashedInput = sha256Base64(passcode);
 				if (hashedInput != null && hashedInput.equals(u.getPassword())) {
+					Main.username = u.getUsername();
 					return u.getRole();
 				}
 				
 			}
 		}
-		return null; // el usuario no es valido 
+		return null; // el usuario no es valido
 	}
 	
 	private static String sha256Base64(String passcode) {
@@ -105,8 +110,6 @@ public class Main {
 		}
 		
 	}
-	
-	
 	
 	public static void cargarDatos() throws FileNotFoundException
 	{
